@@ -1,0 +1,33 @@
+mainDeployment:
+  replicaCount: 2
+  containers:
+    app:
+      pullPolicy: IfNotPresent
+      image:
+        repository: jordanyong/sample-inventory-service
+      ports:
+        - name: http
+          containerPort: 4004
+      resources:
+        limits:
+          cpu: 50m
+          memory: 64Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+
+service:
+  ports:
+    - port: 80
+      targetPort: 4004
+      protocol: TCP
+      name: http
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - pods:
+        metricName: "pod_name:container_cpu_usage:ratio"
+        targetAverageValue: 0.6
+      type: "Pods"
